@@ -3,7 +3,7 @@ from classes.Database import Database
 
 class Reaction:
 
-    SYMBOLS = ["😈", "👿", "👹", "👺", "🤡", "💩", "👻"]
+    SYMBOLS = ["😈", "👿", "👹", "👺", "🤡", "💩", "👻", "🦫", "🦦", "🦥", "😮‍💨", "😵‍💫", "😶‍🌫️", "❤️‍🔥", "❤️‍🩹", "🧔‍♀️"  ]
 
     def __init__(self, message_id, symbol, count, is_new = False):
         self.message_id = message_id
