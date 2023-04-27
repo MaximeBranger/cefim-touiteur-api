@@ -112,7 +112,7 @@ class Message:
     def getWords():
         messages = Database.query_db('SELECT message FROM messages')
         words = [message['message'].split(' ') for message in messages]
-        words = [c for b in words for c in b]
-        words = [word for word in words if len(word) > 3 and len(word) < 12 and re.match(r"[a-zA-Z0-9]+", word)]
-
+        words = [c.lower() for b in words for c in b]
+        words =[re.sub('[@#&"\')ç!-_$*^¨`£ù%=+:/\;,]',  ' ', word) for word in words]
+        words = [word for word in words if len(word) > 3 and len(word) < 12 and re.match(r"[a-z0-9]+", word)]
         return dict(Counter(words))
