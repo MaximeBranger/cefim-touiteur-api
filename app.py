@@ -1,14 +1,24 @@
-from flask import Flask, request, g
+from flask import Flask, request, send_file
 from flask_cors import CORS
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask_jwt_extended import JWTManager
 import sqlite3
 import time
+from  io import BytesIO
 from classes.Database import Database
 from classes.Message import Message
 from classes.Comment import Comment
 from classes.Reaction import Reaction
+from classes.User import User
+from classes.Avatar import Avatar
 
 app = Flask(__name__)
 cors = CORS(app, resources={r"/*": {"origins": "*"}})
+
+app.config["JWT_SECRET_KEY"] = "super-secret"
+jwt = JWTManager(app)
 
 @app.route("/", methods=['GET'])
 def hello_world():
@@ -213,8 +223,68 @@ def remove_reaction():
 def get_avatar():
     username = request.args.get('username', None)
     size = request.args.get('size', 850)
+
+    image = Avatar(username, size).get()
     
-    return False
+    img_io = BytesIO()
+    image.save(img_io, 'PNG', quality=70)
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png')
+
+@app.route("/user/register", methods=['POST'])
+def user_register():
+    username = request.form.get('username', None)
+    password = request.form.get('password', None)
+
+    if User.findByName(username) == True:
+        return {"error": "Username already exists"}
+
+    password_validation = User.is_password_valid(password) 
+    if password_validation != True:
+        return password_validation
+
+    user = User(username, User.hash_password(password))
+
+    result = user.insert()
+    if not result == True:
+        return result
+
+    return { "success": True }
+
+@app.route("/user/login", methods=['POST'])
+def user_login():
+    username = request.form.get('username', None)
+    password = request.form.get('password', None)
+
+    user = User.findByName(username)
+    if not isinstance(user, User):
+        return user
+
+    if not user.password == User.hash_password(password):
+        return {"error": "Invalid password"}
+
+    user = user.make_jwt()
+    if not isinstance(user, User):
+        return user
+
+    return {
+        "access_token": user.jwt
+    }
+
+@app.route("/user/me", methods=['GET'])
+def user_me():
+    token = request.headers.get('Authorization')
+    token = token.replace('Bearer ', '')
+
+    user = User.findByJwt(token)
+    if not isinstance(user, User):
+        return user
+
+    return {
+        "logged_in_as": {
+            "name": user.username,
+            "expiration": None
+    }}
 
 @app.errorhandler(404)
 def not_found(error):

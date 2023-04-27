@@ -47,7 +47,7 @@ class Message:
             )
             return True
         except:
-            return False
+            return {"error": "An error occured while saving"}
 
     def save(self):
         try:
