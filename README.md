@@ -10,6 +10,13 @@ API for custom touiteur (=twitter) inspired from the one provided by CEFIM as su
 - SQLite
 
 ## Usage
+### Docker
+```sh
+docker build -t flask .
+docker create --name flask -p 5000:5000 flask
+docker start
+```
+### From Source
 ```sh
 python -m venv venv
 . venv/bin/activate
