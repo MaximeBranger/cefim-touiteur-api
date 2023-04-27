@@ -9,14 +9,14 @@ API for custom touiteur (=twitter) inspired from the one provided by CEFIM as su
 - Flask
 - SQLite
 
-## To Do List
-- Route /user/register  
-- Route /user/login  
-- Route /user/me
-- Route /send for authentified users
-- Route /avatar/get
-
-- Docker container for Front and Back projet
+## Usage
+```sh
+python -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+python build_db.py
+flask --app app run
+```
 
 ## Documentation provided by CEFIM
 ```
